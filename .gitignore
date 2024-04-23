@@ -1,0 +1,4 @@
+# gitignore files
+nanafeed/
+*.env
+cookies.json
