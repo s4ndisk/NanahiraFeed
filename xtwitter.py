@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
-# imports
->>>>>>> a34b40e (initial commit)
+
 from dotenv import load_dotenv
 import os
 import asyncio
