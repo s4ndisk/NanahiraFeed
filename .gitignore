@@ -3,4 +3,8 @@ nanafeed/
 *.env
 cookies.json
 ids.json
+<<<<<<< HEAD
 __pycache__/
+=======
+__pycache__/
+>>>>>>> a34b40e (initial commit)
