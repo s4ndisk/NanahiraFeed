@@ -2,3 +2,5 @@
 nanafeed/
 *.env
 cookies.json
+ids.json
+__pycache__/
