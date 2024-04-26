@@ -73,7 +73,7 @@ def append_tweet_data(tweet_id, tweet_datetime):
 async def main():
     global latest_tweet_id
     while True:
-        user_tweets = client.get_user_tweets(USER_ID, 'Tweets', count=1)
+        user_tweets = client.get_user_tweets(USER_ID, 'Replies')
         if user_tweets:  # Check if tweets were fetched
             first_tweet = user_tweets[0]  # Get the first tweet
             tweet_id = first_tweet.id
@@ -82,8 +82,6 @@ async def main():
                 append_tweet_data(tweet_id, tweet_datetime)
                 print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} New tweet found: {tweet_id}")
                 latest_tweet_id = tweet_id
-        else:
-            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} No new tweet found")
         print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Sleeping for {POLLING_INTERVAL}s")
         await asyncio.sleep(POLLING_INTERVAL)
 
