@@ -1,29 +1,23 @@
-import discord
-import os 
-from dotenv import load_dotenv
+import xtwitter 
+import asyncio
+from datetime import datetime
+from discord_webhook import DiscordWebhook
 
-#load .env variables
-load_dotenv()
 
-nanahi = discord.bot
+POLLING_INTERVAL = 60 * 1
 
-# announce when bot is up in the CLI
-@nanahi.event
-async def on_ready():
-  print(f'{nanahi.user} is online and ready!')
+async def xtwitter_webhook():
+  latest_tweet_id = None
+  while True:
+    tweet_id = await xtwitter.get_latest_tweet_id()
+    if tweet_id and tweet_id != latest_tweet_id:
+      webhook = DiscordWebhook(url="https://discord.com/api/webhooks/1232155727229882491/BEQfpfu57WQZEahpppK6Af4JKxlm4XWFXImBoWTZWjOdqwY4YbUleR2Gbo9SyuSIMHRE", content=f"https://twitter.com/nanafeed_/status/{tweet_id}")
+      webhook.execute()
+      latest_tweet_id = tweet_id
+    await asyncio.sleep(0)
 
-# slash command to provide link to the github repo
-@nanahi.slash_command(name='#AD', description='shameful plug'
-  async def ad(ctx: discord.ApplicationContext):
-    await ctx.respond('https://github.com/s4ndisk/nanafeed.py') # make this a clean embed later on
+async def main():
+    await asyncio.gather(xtwitter.main(), xtwitter_webhook())
 
-cog_list = [
-  'x-twitter',
-  'spotify',
-  'youtube'
-]
-
-for cog in cogs_list:
-    nanahi.load_extension(f'cogs.{cog}')
-
-nanahi.run(os.getenv('TOKEN'))
+if __name__ == "__main__":
+   asyncio.run(main())

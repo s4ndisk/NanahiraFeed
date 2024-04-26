@@ -1,4 +1,3 @@
-
 from dotenv import load_dotenv
 import os
 import asyncio
@@ -12,7 +11,7 @@ load_dotenv()
 USERNAME = os.getenv('X-TWITTER_USERNAME')
 EMAIL = os.getenv('X-TWITTER_EMAIL')
 PASSWORD = os.getenv('X-TWITTER_PASSWORD')
-# USER_ID = os.getenv('USER_ID')
+USER_ID = os.getenv('USER_ID')
 USER_ID1 = os.getenv('USER_ID1')
 
 # Initialize client
@@ -35,11 +34,17 @@ def X_Formally_Twitter_Login():
 # Use previously saved cookies to login with
 client.load_cookies('cookies.json')
 
-POLLING_INTERVAL = 60 * 1
+POLLING_INTERVAL = 60 * 5
 
 current_time_for_console = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 user_tweets = client.get_user_tweets(USER_ID1, 'Tweets')
+
+latest_tweet_id = None
+
+async def get_latest_tweet_id():
+    global latest_tweet_id
+    return latest_tweet_id
 
 def extract_tweet_ids_and_datetimes(user_tweets):
     tweet_ids = [tweet.id for tweet in user_tweets]
@@ -50,7 +55,7 @@ def search_tweet_data(tweet_ids_to_search):
     with open('ids.json', 'r') as file:
         data = json.load(file)
     
-    for tweet_data in data['x-twitter']:
+    for tweet_data in data['xtwitter']:
         tweet_id = tweet_data['tweet_id']
         if tweet_id in tweet_ids_to_search:
             return True
@@ -61,24 +66,27 @@ def append_tweet_data(tweet_id, tweet_datetime):
     new_data = {"tweet_id": tweet_id, "tweet_date_time": tweet_datetime_str}
     with open('ids.json', 'r+') as file:
         data = json.load(file)
-        data["x-twitter"].append(new_data)
+        data["xtwitter"].append(new_data)
         file.seek(0)
         json.dump(data, file, indent=4)
 
 async def main():
+    global latest_tweet_id
     while True:
-        user_tweets = client.get_user_tweets(USER_ID1, 'Tweets')
-        print(f'{current_time_for_console} Polling X (Formally Twitter) for new tweets')
+        user_tweets = client.get_user_tweets(USER_ID, 'Tweets', count=5)
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Polling X (Formally Twitter) for new tweets")
         tweet_ids, tweet_datetimes = extract_tweet_ids_and_datetimes(user_tweets)
         new_tweet_found = False
         for tweet_id, tweet_datetime in zip(tweet_ids, tweet_datetimes):
             if not search_tweet_data([tweet_id]):
                 append_tweet_data(tweet_id, tweet_datetime)
-                print(f'{current_time_for_console} New tweet found: {tweet_id}')
+                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} New tweet found: {tweet_id}")
                 new_tweet_found = True
+                latest_tweet_id = tweet_id
+                await asyncio.sleep(2)
         if not new_tweet_found:
-            print(f'{current_time_for_console} No new tweet found')
-        print(f'{current_time_for_console} Sleeping for {POLLING_INTERVAL}s')
+            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} No new tweet found")
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Sleeping for {POLLING_INTERVAL}s")
         await asyncio.sleep(POLLING_INTERVAL)
 
 
@@ -87,9 +95,4 @@ if __name__ == "__main__":
     asyncio.run(main())
 
 # Implement way for script to prevent missing tweets if a tweet was made during the sleep period
-
-
-
-    
-
-
+# even though count is set to 5 it is polling tweets till the end, only want it to poll the top 5 before sleeping
