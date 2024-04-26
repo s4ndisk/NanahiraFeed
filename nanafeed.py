@@ -15,6 +15,7 @@ async def xtwitter_webhook():
       webhook.execute()
       latest_tweet_id = tweet_id
     await asyncio.sleep(0)
+## implement way for xtwitter_webhook to take tweet ids (if given more than 1) and send them in reverse order so that way it is chronologically correct
 
 async def main():
     await asyncio.gather(xtwitter.main(), xtwitter_webhook())
