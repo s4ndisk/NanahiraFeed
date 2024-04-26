@@ -29,28 +29,33 @@ def X_Formally_Twitter_Login():
 
 # To be safe, you should only need to run this function once to store cookies, then comment it out so you login with cached cookies. 
 # Less likely for your account to get banned this way
-# X_Formally_Twitter_Login()
+## X_Formally_Twitter_Login()
 
 # Use previously saved cookies to login with
 client.load_cookies('cookies.json')
 
+# Time to poll X (Formally Twitter) for new tweets 
+## Make this RNG so I dont get banned for botting by X (Formally Twitter)
 POLLING_INTERVAL = 60 * 5
 
-current_time_for_console = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
+# Define user_tweet var
 user_tweets = client.get_user_tweets(USER_ID1, 'Tweets')
 
+# Set var to None by default
 latest_tweet_id = None
 
+# Define latest tweet var as global and return its value
 async def get_latest_tweet_id():
     global latest_tweet_id
     return latest_tweet_id
 
+# Format the polled data to be just the id and the datetime for the JSON database
 def extract_tweet_ids_and_datetimes(user_tweets):
     tweet_ids = [tweet.id for tweet in user_tweets]
     tweet_datetimes = [tweet.created_at_datetime for tweet in user_tweets]
     return tweet_ids, tweet_datetimes
 
+# Search JSON database for tweet id to determine if polled tweet is new or not
 def search_tweet_data(tweet_ids_to_search):
     with open('ids.json', 'r') as file:
         data = json.load(file)
@@ -61,6 +66,7 @@ def search_tweet_data(tweet_ids_to_search):
             return True
     return False
 
+# Append polled tweet data to the JSON database 
 def append_tweet_data(tweet_id, tweet_datetime):
     tweet_datetime_str = tweet_datetime.strftime('%Y-%m-%dT%H:%M:%SZ')
     new_data = {"tweet_id": tweet_id, "tweet_date_time": tweet_datetime_str}
