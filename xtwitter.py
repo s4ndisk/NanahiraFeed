@@ -79,23 +79,25 @@ def append_tweet_data(tweet_id, tweet_datetime):
 async def main():
     global latest_tweet_id
     while True:
-        user_tweets = client.get_user_tweets(USER_ID, 'Replies')
-        if user_tweets:  # Check if tweets were fetched
-            first_tweet = user_tweets[0]  # Get the first tweet
-            tweet_id = first_tweet.id
-            tweet_datetime = first_tweet.created_at_datetime
-            if not search_tweet_data([tweet_id]):
-                append_tweet_data(tweet_id, tweet_datetime)
-                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} New tweet found: {tweet_id}")
-                latest_tweet_id = tweet_id
+        user_tweets = client.get_user_tweets(USER_ID, 'Tweets')
+        if user_tweets:
+            count = 5 # set initial value of count var to 5
+            for tweet in user_tweets: # for loop for checking tweets
+                first_tweet = user_tweets[count]  # get the tweet in order of count var
+                tweet_id = first_tweet.id
+                tweet_datetime = first_tweet.created_at_datetime
+                if not search_tweet_data([tweet_id]): # search if tweet id is in the json database, if not add it to the database and set it equal to latest_tweet_id var
+                    append_tweet_data(tweet_id, tweet_datetime)
+                    print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} New tweet found: {tweet_id}")
+                    latest_tweet_id = tweet_id
+                    count -= 1 # decreas the value of count var on each loop
+                    await asyncio.sleep(2)
+                if count < 0: # break the loop once the count var goes less than 0
+                    break
+        if latest_tweet_id == None:
+            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} No new tweets found")
         print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Sleeping for {POLLING_INTERVAL}s")
         await asyncio.sleep(POLLING_INTERVAL)
 
-
-
-
 if __name__ == "__main__":
     asyncio.run(main())
-
-# Implement way for script to prevent missing tweets if a tweet was made during the sleep period
-# even though count is set to 5 it is polling tweets till the end, only want it to poll the top 5 before sleeping
