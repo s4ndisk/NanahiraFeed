@@ -12,7 +12,9 @@ SPOTIPY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 
 spotipy = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 
-results = spotipy.artist_top_tracks(SPOTIFY_ARTIST_URI)
+latest_album = spotipy.artist_albums(SPOTIFY_ARTIST_URI, album_type='album', limit=1)
+latest_single = spotipy.artist_albums(SPOTIFY_ARTIST_URI, album_type='single', limit=1)
+latest_album_appeared_in = spotipy.artist_albumes(SPOTIFY_ARTIST_URI, album_type='appears_on', limit=1)
 
 for track in results['tracks'][:10]:
     print('track    : ' + track['name'])
