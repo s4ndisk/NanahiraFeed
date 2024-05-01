@@ -4,3 +4,4 @@ nanafeed/
 cookies.json
 ids.json
 __pycache__/
+*.cache
