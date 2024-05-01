@@ -109,7 +109,6 @@ async def latest_album_appeared_on():
 async def main():
     while True:
         await asyncio.gather(latest_album(), latest_single(), latest_album_appeared_on())
-        await asyncio.sleep(300)
 
 if __name__ == "__main__":
     asyncio.run(main())
