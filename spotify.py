@@ -17,6 +17,8 @@ album = spotipy.artist_albums(SPOTIFY_ARTIST_URI, album_type='album', limit=1)
 single = spotipy.artist_albums(SPOTIFY_ARTIST_URI, album_type='single', limit=1)
 album_appeared_on = spotipy.artist_albums(SPOTIFY_ARTIST_URI, album_type='appears_on', limit=1)
 
+POLLING_INTERVAL = 60 * 5
+
 def search_spotify_data(s_id):
     with open('ids.json', 'r') as file:
         data = json.load(file)
@@ -36,9 +38,21 @@ def append_spotify_data(s_id, url):
         json.dump(data, file, indent=4)
 
 async def latest_album():
-    album_id = album['id']
-    album_url = album['external_urls']['spotify']
-    return album_url
+    while True:
+        album_id = album['id']
+        album_url = album['external_urls']['spotify']
+        if album_id:
+            for s_id in album_id:
+                if not search_spotify_data([album_id]):
+                    append_spotify_data(album_id, album_url)
+                    print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} New album found: {album_id}")
+                    latest_album_url = album_url
+                    return latest_album_url
+        if latest_album_id == None:
+            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} No new albums found")
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Sleeping for {POLLING_INTERVAL}s")
+        await asyncio.sleep(POLLING_INTERVAL)
+        
 
 async def latest_single():
     single_id = single['id']
