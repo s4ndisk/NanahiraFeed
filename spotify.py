@@ -20,16 +20,22 @@ album_appeared_on = sp.artist_albums(SPOTIFY_ARTIST_URI, album_type='appears_on'
 
 POLLING_INTERVAL = 60 * 5
 
-async def get_latest(data):
-    if data is album:
-        global latest_album_url
-        return latest_album_url
-    elif data is single:
-        global latest_single_url
-        return latest_single_url
-    elif data is album_appeared_on:
-        global latest_album_appeared_on
-        return latest_album_appeared_on
+latest_album_url = None
+latest_single_url = None
+latest_album_appeared_on_url = None
+
+async def get_latest_album():
+    global latest_album_url
+    return latest_album_url
+
+async def get_latest_single():
+    global latest_single_url
+    return latest_single_url
+
+async def get_latest_album_appeared_on():
+    global latest_album_appeared_on_url
+    return latest_album_appeared_on_url
+    
 
 def search_spotify_data(url):
     with open('ids.json', 'r') as file:
@@ -51,7 +57,6 @@ def append_spotify_data(url, date):
 
 async def latest_album():
     global latest_album_url
-    latest_album_url = None
     while True:
         album_url = album['items'][0]['external_urls']['spotify']
         album_date = album['items'][0]['release_date']
@@ -69,7 +74,6 @@ async def latest_album():
 
 async def latest_single():
     global latest_single_url
-    latest_single_url = None
     while True:
         single_url = single['items'][0]['external_urls']['spotify']
         single_date = single['items'][0]['release_date']
@@ -86,8 +90,7 @@ async def latest_single():
    
 
 async def latest_album_appeared_on():
-    global latest_album_appeared_on
-    latest_album_appeared_on = None
+    global latest_album_appeared_on_url
     while True:
         album_appeared_on_url = album_appeared_on['items'][0]['external_urls']['spotify']
         album_appeared_on_date = album_appeared_on['items'][0]['release_date']
