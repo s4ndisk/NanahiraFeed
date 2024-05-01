@@ -16,15 +16,15 @@ album = spotipy.artist_albums(SPOTIFY_ARTIST_URI, album_type='album', limit=1)
 single = spotipy.artist_albums(SPOTIFY_ARTIST_URI, album_type='single', limit=1)
 album_appeared_on = spotipy.artist_albums(SPOTIFY_ARTIST_URI, album_type='appears_on', limit=1)
 
-async def latest_album:
+async def latest_album():
     album_id = album['id']
     album_url = album['external_urls']['spotify']
 
-async def latest_single:
+async def latest_single():
     single_id = single['id']
     album_url = album['external_urls']['spotify']
 
-async def latest_album_appeared_on:
+async def latest_album_appeared_on():
    album_appeared_on_id = album_appeared_on['id']
    album_appeared_on_url = album_appeared_on['external_urls']['spotify']
                        
