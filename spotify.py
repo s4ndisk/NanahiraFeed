@@ -22,7 +22,7 @@ async def latest_album():
 
 async def latest_single():
     single_id = single['id']
-    album_url = album['external_urls']['spotify']
+    single_url = single['external_urls']['spotify']
 
 async def latest_album_appeared_on():
    album_appeared_on_id = album_appeared_on['id']
