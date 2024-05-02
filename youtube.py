@@ -2,11 +2,13 @@ import urllib.request
 import re
 import os
 import json
+from dotenv import load_dotenv
 from datetime import datetime
 import asyncio
 
-YT_CHANNEL_ID = "UN_fYA9QRK-aJnFTgvR_4zug"
-YT_CHANNEL_AT = "@Nanahira_Confetto"
+load_dotenv()
+
+YT_CHANNEL_AT = os.getenv('YT_CHANNEL_AT')
 
 POLLING_INTERVAL = 60 * 5
 
@@ -31,8 +33,8 @@ def search_youtube_data(url):
             return True
     return False
 
-def append_youtube_data(url, date):
-    new_data = {"youtube_url": url, "youtube_date": date}
+def append_youtube_data(url):
+    new_data = {"youtube_url": url}
     with open('ids.json', 'r+') as file:
         data = json.load(file)
         data["youtube"].append(new_data)
@@ -42,14 +44,14 @@ def append_youtube_data(url, date):
 async def latest_stream():
     global latest_stream_url
     while True:
-        streams = f"https://www.youtube.com/{YT_CHANNEL_AT}/streams"
-        html = urlib.request.urlopen(f"{videos}")
-        stream_id = re.findall(r"watch\?v=(\S{11})", html.read().decode)
-        stream_url = "https://www.youtube.com/watch?v=" + stream_id[0]
+        streams = f"https://www.youtube.com/{YT_CHANNEL_AT}/live"
+        html = urllib.request.urlopen(f"{streams}")
+        stream_id = re.findall(r"watch\?v=(\S{11})", html.read().decode())
+        stream_url = "https://www.youtube.com/watch?v=" + stream_id[1]
         if stream_url:
             for url in stream_url:
                 if not search_youtube_data([stream_url]):
-                    append_youtube_data(stream_url, stream_date)
+                    append_youtube_data(stream_url)
                     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} New stream found: {stream_url}")
                     latest_stream_url = stream_url
         if latest_stream_url == None:
@@ -58,6 +60,7 @@ async def latest_stream():
         await asyncio.sleep(POLLING_INTERVAL)
 
 async def latest_video():
+    global latest_video_url
     videos = f"https://www.youtube.com/{YT_CHANNEL_AT}/videos"
     html = urllib.request.urlopen(f"{videos}")
     video_id = re.findall(r"watch\?v=(\S{11})", html.read().decode())
@@ -65,8 +68,8 @@ async def latest_video():
     if video_url:
         for url in video_url:
             if not search_youtube_data([video_url]):
-                append_youtube_data(video_url, video_date)
-                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} New video found: {stream_url}")
+                append_youtube_data(video_url)
+                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} New video found: {video_url}")
                 latest_video_url = video_url
     if latest_video_url == None:
             print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} No new videos found")

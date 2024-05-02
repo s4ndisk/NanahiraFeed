@@ -1,10 +1,14 @@
 import xtwitter 
 import spotify
+import youtube
 import asyncio
+from dotenv import load_dotenv
 from datetime import datetime
 from discord_webhook import DiscordWebhook
 
-webhook_url = "https://discord.com/api/webhooks/1232155727229882491/BEQfpfu57WQZEahpppK6Af4JKxlm4XWFXImBoWTZWjOdqwY4YbUleR2Gbo9SyuSIMHRE"
+load_dotenv()
+
+webhook_url = os.getenv('DISCORD_WEBHOOK')
 
 def send_webhook(content):
   webhook = DiscordWebhook(url=webhook_url, content=content)
@@ -19,8 +23,8 @@ async def xtwitter_webhook():
         send_webhook(f"ななひら just tweeted!\n\nhttps://twitter.com/nanafeed_/status/{tweet_id}")
         latest_tweet_id = tweet_id
     
-    except Exception as f:
-      print(f"An error occurred in the XTwitter webhook: {f}")
+    except Exception as e:
+      print(f"An error occurred in the XTwitter webhook: {e}")
 
     await asyncio.sleep(0)
 
@@ -45,14 +49,34 @@ async def spotify_webhook():
         send_webhook(f"ななひら just appeared on an album on Spotify!\n\n{album_appeared_on_url}")
         latest_album_appeared_on_url = album_appeared_on_url
     
-    except Exception as e:
-      print(f"An error occurred in Spotify webhook: {e}")
+    except Exception as f:
+      print(f"An error occurred in Spotify webhook: {f}")
 
+    await asyncio.sleep(0)
+
+async def youtube_webhook():
+  latest_video_url = None
+  latest_stream_url = None
+  while True:
+    try:
+      video_url = await youtube.get_latest_video()
+      if video_url and video_url != latest_video_url:
+        send_webhook(f"ななひら just posted a video on Youtube!\n\n{video_url}")
+        latest_video_url = video_url
+      
+      stream_url = await youtube.get_latest_stream()
+      if stream_url and stream_url != latest_stream_url:
+        send_webhook(f"ななひら just went/is/was live on Youtube!\n\n{stream_url}")
+        latest_stream_url = stream_url
+    
+    except Exception as g:
+      print(f"An error occurred in Youtube webhook: {g}")
+    
     await asyncio.sleep(0)
       
 
 async def main():
-    await asyncio.gather(xtwitter.main(), xtwitter_webhook(), spotify.main(), spotify_webhook())
+    await asyncio.gather(xtwitter.main(), xtwitter_webhook(), spotify.main(), spotify_webhook(), youtube.main(), youtube_webhook())
 
 if __name__ == "__main__":
    asyncio.run(main())
