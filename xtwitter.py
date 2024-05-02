@@ -8,9 +8,9 @@ from twikit import Client, Tweet
 
 load_dotenv()
 
-USERNAME = os.getenv('X-TWITTER_USERNAME')
-EMAIL = os.getenv('X-TWITTER_EMAIL')
-PASSWORD = os.getenv('X-TWITTER_PASSWORD')
+USERNAME = os.getenv('XTWITTER_USERNAME')
+EMAIL = os.getenv('XTWITTER_EMAIL')
+PASSWORD = os.getenv('XTWITTER_PASSWORD')
 USER_ID = os.getenv('USER_ID')
 USER_ID1 = os.getenv('USER_ID1')
 
@@ -18,21 +18,26 @@ USER_ID1 = os.getenv('USER_ID1')
 client = Client()
 
 def X_Formally_Twitter_Login():
-    # Login to X (Formally Twitter) with provided user credentials
-    client.login(
-        auth_info_1=USERNAME ,
-        auth_info_2=EMAIL,
-        password=PASSWORD
-    )
-    # Saving X (Formally Twitter) cookies to login with in the future 
-    client.load_cookies('cookies.json')
 
-# To be safe, you should only need to run this function once to store cookies, then comment it out so you login with cached cookies. 
-# Less likely for your account to get banned this way
-## X_Formally_Twitter_Login()
+    file_path = "cookies.json"
 
-# Use previously saved cookies to login with
-client.load_cookies('cookies.json')
+    if not os.path.exists(file_path):
+         # Login to X (Formally Twitter) with provided user credentials
+        client.login(
+            auth_info_1=USERNAME,
+            auth_info_2=EMAIL,
+            password=PASSWORD
+        )
+         # Saving X (Formally Twitter) cookies to login with in the future 
+        client.save_cookies(file_path)
+        client.load_cookies(file_path)
+            
+    else:
+         # Use previously saved cookies to login with
+         client.load_cookies(file_path)
+
+
+X_Formally_Twitter_Login()
 
 # Time to poll X (Formally Twitter) for new tweets 
 ## Make this RNG so I dont get banned for botting by X (Formally Twitter)
@@ -101,3 +106,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+
+    

@@ -3,11 +3,28 @@ import os
 import spotify
 import youtube
 import asyncio
+import json
 from dotenv import load_dotenv
 from datetime import datetime
 from discord_webhook import DiscordWebhook
 
 load_dotenv()
+
+def create_ids_db():
+  data = {
+    "xtwitter": [],
+    "spotify": [],
+    "youtube": []
+  }
+
+  file_path = "ids.json"
+
+  if not os.path.exists(file_path):
+    with open(file_path, "w") as json_file:
+      json.dump(data, json_file)
+    print("Creating database file for IDs at:", file_path)
+  else:
+    print("Database file for IDs already exists. Continuing")
 
 webhook_url = os.getenv('DISCORD_WEBHOOK')
 
@@ -77,6 +94,8 @@ async def youtube_webhook():
       
 
 async def main():
+    create_ids_db()
+
     await asyncio.gather(xtwitter.main(), xtwitter_webhook(), spotify.main(), spotify_webhook(), youtube.main(), youtube_webhook())
 
 if __name__ == "__main__":
