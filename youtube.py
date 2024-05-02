@@ -24,17 +24,39 @@ def append_youtube_data(url, date):
         json.dump(data, file, indent=4)
 
 async def latest_stream():
-    streams = f"https://www.youtube.com/{YT_CHANNEL_AT}/streams"
-    html = urlib.request.urlopen(f"{videos}")
-    stream_id = re.findall(r"watch\?v=(\S{11})", html.read().decode)
-    print("https://www.youtube.com/watch?v=" + stream_id[0])
-
+    global latest_stream_url
+    while True:
+        streams = f"https://www.youtube.com/{YT_CHANNEL_AT}/streams"
+        html = urlib.request.urlopen(f"{videos}")
+        stream_id = re.findall(r"watch\?v=(\S{11})", html.read().decode)
+        stream_url = "https://www.youtube.com/watch?v=" + stream_id[0]
+        if stream_url:
+            for url in stream_url:
+                if not search_youtube_data([stream_url]):
+                    append_youtube_data(stream_url, stream_date)
+                    print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} New stream found: {stream_url}")
+                    latest_stream_url = stream_url
+        if latest_stream_url == None:
+            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} No new streams found")
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Sleeping for {POLLING_INTERVAL}s")
+        await asyncio.sleep(POLLING_INTERVAL)
 
 async def latest_video():
     videos = f"https://www.youtube.com/{YT_CHANNEL_AT}/videos"
     html = urllib.request.urlopen(f"{videos}")
     video_id = re.findall(r"watch\?v=(\S{11})", html.read().decode())
-    print("https://www.youtube.com/watch?v=" + video_id[0])
+    video_url = "https://www.youtube.com/watch?v=" + video_id[0]
+    if video_url:
+        for url in video_url:
+            if not search_youtube_data([video_url]):
+                append_youtube_data(video_url, video_date)
+                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} New video found: {stream_url}")
+                latest_video_url = video_url
+    if latest_video_url == None:
+            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} No new videos found")
+    print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Sleeping for {POLLING_INTERVAL}s")
+    await asyncio.sleep(POLLING_INTERVAL)
+
 
 async def main():
     while True:
