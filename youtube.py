@@ -1,9 +1,24 @@
 import urllib.request
 import re
+import os
+from datetime import datetime
 import asyncio
 
 YT_CHANNEL_ID = "UN_fYA9QRK-aJnFTgvR_4zug"
 YT_CHANNEL_AT = "@Nanahira_Confetto"
+
+POLLING_INTERVAL = 60 * 5
+
+latest_video_url = None
+latest_stream_url = None
+
+async def get_latest_video():
+    global latest_video_url
+    return latest_video_url
+
+async def get_latest_stream():
+    global latest_stream_url
+    return latest_stream_url
 
 def search_youtube_data(url):
     with open('ids.json', 'r') as file:
