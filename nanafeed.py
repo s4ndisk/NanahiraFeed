@@ -13,13 +13,17 @@ def send_webhook(content):
 async def xtwitter_webhook():
   latest_tweet_id = None
   while True:
-    tweet_id = await xtwitter.get_latest_tweet_id()
-    if tweet_id and tweet_id != latest_tweet_id:
-      send_webhook(f"ななひら just tweeted!\n\nhttps://twitter.com/nanafeed_/status/{tweet_id}")
-      latest_tweet_id = tweet_id
+    try:
+      tweet_id = await xtwitter.get_latest_tweet_id()
+      if tweet_id and tweet_id != latest_tweet_id:
+        send_webhook(f"ななひら just tweeted!\n\nhttps://twitter.com/nanafeed_/status/{tweet_id}")
+        latest_tweet_id = tweet_id
+    
+    except Exception as f:
+      print(f"An error occurred in the XTwitter webhook: {f}")
+
     await asyncio.sleep(0)
 
-## needs testing
 async def spotify_webhook():
   latest_album_url = None
   latest_single_url = None
