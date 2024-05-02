@@ -1,4 +1,5 @@
 import xtwitter 
+import os
 import spotify
 import youtube
 import asyncio
@@ -20,7 +21,7 @@ async def xtwitter_webhook():
     try:
       tweet_id = await xtwitter.get_latest_tweet_id()
       if tweet_id and tweet_id != latest_tweet_id:
-        send_webhook(f"ななひら just tweeted!\n\nhttps://twitter.com/nanafeed_/status/{tweet_id}")
+        send_webhook(f"ななひら tweeted!\n\nhttps://twitter.com/nanafeed_/status/{tweet_id}")
         latest_tweet_id = tweet_id
     
     except Exception as e:
@@ -36,17 +37,17 @@ async def spotify_webhook():
     try:
       album_url = await spotify.get_latest_album()
       if album_url and album_url != latest_album_url:
-        send_webhook(f"ななひら just released an album on Spotify!\n\n{album_url}")
+        send_webhook(f"ななひら released an album on Spotify!\n\n{album_url}")
         latest_album_url = album_url
 
       single_url = await spotify.get_latest_single()
       if single_url and single_url != latest_single_url:
-        send_webhook(f"ななひら just released a single on Spotify!\n\n{single_url}")
+        send_webhook(f"ななひら released a single on Spotify!\n\n{single_url}")
         latest_single_url = single_url
       
       album_appeared_on_url = await spotify.get_latest_album_appeared_on()
       if album_appeared_on_url and album_appeared_on_url != latest_album_appeared_on_url:
-        send_webhook(f"ななひら just appeared on an album on Spotify!\n\n{album_appeared_on_url}")
+        send_webhook(f"ななひら appeared on an album on Spotify!\n\n{album_appeared_on_url}")
         latest_album_appeared_on_url = album_appeared_on_url
     
     except Exception as f:
@@ -61,12 +62,12 @@ async def youtube_webhook():
     try:
       video_url = await youtube.get_latest_video()
       if video_url and video_url != latest_video_url:
-        send_webhook(f"ななひら just posted a video on Youtube!\n\n{video_url}")
+        send_webhook(f"ななひら posted a video on Youtube!\n\n{video_url}")
         latest_video_url = video_url
       
       stream_url = await youtube.get_latest_stream()
       if stream_url and stream_url != latest_stream_url:
-        send_webhook(f"ななひら just went/is/was live on Youtube!\n\n{stream_url}")
+        send_webhook(f"ななひら went/is/was live on Youtube!\n\n{stream_url}")
         latest_stream_url = stream_url
     
     except Exception as g:
