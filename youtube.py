@@ -10,7 +10,7 @@ load_dotenv()
 
 YT_CHANNEL_AT = os.getenv('YT_CHANNEL_AT')
 
-POLLING_INTERVAL = 60 * 5
+POLLING_INTERVAL = 60 * 60
 
 latest_video_url = None
 latest_stream_url = None

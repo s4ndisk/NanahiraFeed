@@ -18,7 +18,7 @@ album = sp.artist_albums(SPOTIFY_ARTIST_URI, album_type='album', limit=1)
 single = sp.artist_albums(SPOTIFY_ARTIST_URI, album_type='single', limit=1)
 album_appeared_on = sp.artist_albums(SPOTIFY_ARTIST_URI, album_type='appears_on', limit=1)
 
-POLLING_INTERVAL = 60 * 5
+POLLING_INTERVAL = 60 * 60 * 24
 
 latest_album_url = None
 latest_single_url = None
