@@ -6,9 +6,11 @@ import asyncio
 import json
 from dotenv import load_dotenv
 from datetime import datetime
-from discord_webhook import DiscordWebhook
+from discord_webhook import DiscordWebhook, DiscordEmbed
 
 load_dotenv()
+
+webhook_url = os.getenv('DISCORD_WEBHOOK')
 
 def create_ids_db():
   data = {
@@ -26,12 +28,6 @@ def create_ids_db():
   else:
     print("Database file for IDs already exists. Continuing")
 
-webhook_url = os.getenv('DISCORD_WEBHOOK')
-
-def send_webhook(content):
-  webhook = DiscordWebhook(url=webhook_url, content=content)
-  webhook.execute()
-
 async def xtwitter_webhook():
   latest_tweet_id = None
   while True:
@@ -46,29 +42,76 @@ async def xtwitter_webhook():
 
     await asyncio.sleep(0)
 
+async def album_spotify():
+  global latest_album
+  album = await spotify.get_latest_album()
+  if album:
+    album_url = album['items'][0]['external_urls']['spotify']
+    album_name = album['items'][0]['name']
+    album_cover_url = album['items'][0]['images'][0]['url']
+    embed = DiscordEmbed(
+      title="ななひら - Spotify",
+      description=f"ななひら uploaded an album on Spotify\n\n**{album_name} - [Spotify Link]({album_url})**"
+    )
+    embed.set_image(url=album_cover_url)
+    embedhook = DiscordWebhook(url=webhook_url)
+    embedhook.add_embed(embed)
+    if album and album != latest_album:
+      embedhook.execute()
+      latest_album = album
+    
+async def single_spotify():
+  global latest_single
+  single = await spotify.get_latest_single()
+  if single:
+    single_url = single['items'][0]['external_urls']['spotify']
+    single_name = single['items'][0]['name']
+    single_cover_url = single['items'][0]['images'][0]['url']
+    embed = DiscordEmbed(
+      title="ななひら - Spotify",
+      description=f"ななひら uploaded a single on Spotify\n\n**{single_name} - [Spotify Link]({single_url})**"
+    )
+    embed.set_image(url=single_cover_url)
+    embedhook = DiscordWebhook(url=webhook_url)
+    embedhook.add_embed(embed)
+    if single and single != latest_single:
+      embedhook.execute()
+      latest_single = single
+
+async def album_appeared_on_spotify():
+  global latest_album_appeared_on
+  album_appeared_on = await spotify.get_latest_album_appeared_on()
+  if album_appeared_on:
+    album_appeared_on_url = album_appeared_on['items'][0]['external_urls']['spotify']
+    album_appeared_on_name = album_appeared_on['items'][0]['name']
+    album_appeared_on_cover_url = album_appeared_on['items'][0]['images'][0]['url']
+    embed = DiscordEmbed(
+      title="ななひら - Spotify",
+      description=f"ななひら appeared on an album on Spotify\n\n**{album_appeared_on_name} - [Spotify Link]({album_appeared_on_url})**"
+    )
+    embed.set_image(url=album_appeared_on_cover_url)
+    embedhook = DiscordWebhook(url=webhook_url)
+    embedhook.add_embed(embed)
+    if album_appeared_on and album_appeared_on != latest_album_appeared_on:
+      embedhook.execute()
+      latest_album_appeared_on = album_appeared_on
+
 async def spotify_webhook():
-  latest_album_url = None
-  latest_single_url = None
-  latest_album_appeared_on_url = None
+  global latest_album, latest_single, latest_album_appeared_on
+  latest_album = None
+  latest_single = None
+  latest_album_appeared_on = None
   while True:
     try:
-      album_url = await spotify.get_latest_album()
-      if album_url and album_url != latest_album_url:
-        send_webhook(f"ななひら released an album on Spotify!\n\n{album_url}")
-        latest_album_url = album_url
+      await album_spotify()
 
-      single_url = await spotify.get_latest_single()
-      if single_url and single_url != latest_single_url:
-        send_webhook(f"ななひら released a single on Spotify!\n\n{single_url}")
-        latest_single_url = single_url
+      await single_spotify()
       
-      album_appeared_on_url = await spotify.get_latest_album_appeared_on()
-      if album_appeared_on_url and album_appeared_on_url != latest_album_appeared_on_url:
-        send_webhook(f"ななひら appeared on an album on Spotify!\n\n{album_appeared_on_url}")
-        latest_album_appeared_on_url = album_appeared_on_url
+      await album_appeared_on_spotify()
     
     except Exception as f:
       print(f"An error occurred in Spotify webhook: {f}")
+      await asyncio.sleep(400)
 
     await asyncio.sleep(0)
 
