@@ -122,16 +122,35 @@ async def youtube_webhook():
     try:
       video_url = await youtube.get_latest_video()
       if video_url and video_url != latest_video_url:
-        send_webhook(f"ななひら posted a video on Youtube!\n\n{video_url}")
+        video_thumbnail = await youtube.get_video_thumbnail()
+        video_title = await youtube.get_video_title()
+        embed = DiscordEmbed(
+        title="ななひら - Youtube",
+        description=f"ななひら uploaded a video on Youtube\n\n**{video_title} - [Youtube Link]({video_url})**"
+        )
+        embed.set_image(url=video_thumbnail)
+        embedhook = DiscordWebhook(url=webhook_url)
+        embedhook.add_embed(embed)
+        embedhook.execute()
         latest_video_url = video_url
       
       stream_url = await youtube.get_latest_stream()
       if stream_url and stream_url != latest_stream_url:
-        send_webhook(f"ななひら went/is/was live on Youtube!\n\n{stream_url}")
+        stream_thumbnail = await youtube.get_stream_thumbnail()
+        stream_title = await youtube.get_stream_title()
+        embed = DiscordEmbed(
+        title="ななひら - Youtube",
+        description=f"ななひら is/was live on Youtube\n\n**{stream_title} - [Youtube Link]({stream_url})**"
+        )
+        embed.set_image(url=stream_thumbnail)
+        embedhook = DiscordWebhook(url=webhook_url)
+        embedhook.add_embed(embed)
+        embedhook.execute()
         latest_stream_url = stream_url
     
     except Exception as g:
       print(f"An error occurred in Youtube webhook: {g}")
+      await asyncio.sleep(400)
     
     await asyncio.sleep(0)
       

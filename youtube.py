@@ -61,20 +61,69 @@ async def latest_stream():
 
 async def latest_video():
     global latest_video_url
-    videos = f"https://www.youtube.com/{YT_CHANNEL_AT}/videos"
-    html = urllib.request.urlopen(f"{videos}")
-    video_id = re.findall(r"watch\?v=(\S{11})", html.read().decode())
-    video_url = "https://www.youtube.com/watch?v=" + video_id[0]
-    if video_url:
-        for url in video_url:
-            if not search_youtube_data([video_url]):
-                append_youtube_data(video_url)
-                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} New video found: {video_url}")
-                latest_video_url = video_url
-    if latest_video_url == None:
-            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} No new videos found")
-    print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Sleeping for {POLLING_INTERVAL}s")
-    await asyncio.sleep(POLLING_INTERVAL)
+    while True:
+        videos = f"https://www.youtube.com/{YT_CHANNEL_AT}/videos"
+        html = urllib.request.urlopen(f"{videos}")
+        video_id = re.findall(r"watch\?v=(\S{11})", html.read().decode())
+        video_url = "https://www.youtube.com/watch?v=" + video_id[0]
+        if video_url:
+            for url in video_url:
+                if not search_youtube_data([video_url]):
+                    append_youtube_data(video_url)
+                    print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} New video found: {video_url}")
+                    latest_video_url = video_url
+        if latest_video_url == None:
+                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} No new videos found")
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Sleeping for {POLLING_INTERVAL}s")
+        await asyncio.sleep(POLLING_INTERVAL)
+
+async def get_video_thumbnail():
+    response = urllib.request.urlopen(latest_video_url)
+    html_content = response.read().decode('utf-8')
+
+    thumbnail_pattern = re.compile(r'<meta property="og:image" content="([^"]+)"')
+    match = thumbnail_pattern.search(html_content)
+
+    if match:
+        thumbnail_url = match.group(1)
+        return thumbnail_url
+
+async def get_video_title():
+    response = urllib.request.urlopen(latest_video_url)
+    html_content = response.read().decode('utf-8')
+
+    title_pattern = re.compile(r'<title>(.*?) - YouTube</title>')
+    match = title_pattern.search(html_content)
+
+    if match:
+        title = match.group(1)
+        return title
+
+async def get_stream_thumbnail():
+    response = urllib.request.urlopen(latest_stream_url)
+    html_content = response.read().decode('utf-8')
+
+    thumbnail_pattern = re.compile(r'<meta property="og:image" content="([^"]+)"')
+    match = thumbnail_pattern.search(html_content)
+
+    if match:
+        thumbnail_url = match.group(1)
+        return thumbnail_url
+
+
+async def get_stream_title():
+    response = urllib.request.urlopen(latest_stream_url)
+    html_content = response.read().decode('utf-8')
+
+    title_pattern = re.compile(r'<title>(.*?) - YouTube</title>')
+    match = title_pattern.search(html_content)
+
+    if match:
+        title = match.group(1)
+        return title
+    else:
+        print("No url")
+
 
 
 async def main():
