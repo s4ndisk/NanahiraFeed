@@ -18,6 +18,6 @@ Python web-scraper for grabbing all posts/uploads from ななひら (Nanahira) a
 - Replies (Soon, bugged atm)
 
 ### Examples
-(/README/spotify_output.png)\
-(/README/youtube_output.png)\
-(/README/twitter_output.png)
+![alt text](https://github.com/s4ndisk/NanahiraFeed/blob/main/README/spotify_output.png)\
+![alt text](https://github.com/s4ndisk/NanahiraFeed/blob/main/README/twitter_output.png)\
+![alt text](https://github.com/s4ndisk/NanahiraFeed/blob/main/README/youtube_output.png)
