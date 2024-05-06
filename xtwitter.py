@@ -2,6 +2,7 @@ import os
 import asyncio
 import time
 import json
+import requests
 from dotenv import load_dotenv
 from datetime import datetime
 from twikit import Client, Tweet
@@ -44,7 +45,7 @@ X_Formally_Twitter_Login()
 POLLING_INTERVAL = 60 * 5
 
 # Define user_tweet var
-user_tweets = client.get_user_tweets(USER_ID1, 'Tweets')
+user_tweets = client.get_user_tweets(USER_ID, 'Tweets')
 
 # Set var to None by default
 latest_tweet_id = None
@@ -53,6 +54,24 @@ latest_tweet_id = None
 async def get_latest_tweet_id():
     global latest_tweet_id
     return latest_tweet_id
+
+async def get_profile_picture():
+    user = client.get_user_by_id(USER_ID)
+    if user:
+        return user.profile_image_url
+
+async def get_tweet_text():
+    tweet = client.get_tweet_by_id(latest_tweet_id)
+    if tweet:
+        return tweet.text
+
+async def get_tweet_media_url(tweet_id):
+    tweet = client.get_tweet_by_id(tweet_id)
+    if tweet.media:
+        for i, media in enumerate(tweet.media):
+            media_url = media.get('media_url_https')
+            if media_url:
+                return media_url
 
 # Format the polled data to be just the id and the datetime for the JSON database
 def extract_tweet_ids_and_datetimes(user_tweets):

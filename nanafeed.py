@@ -11,6 +11,7 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 load_dotenv()
 
 webhook_url = os.getenv('DISCORD_WEBHOOK')
+USER_ID = os.getenv('USER_ID')
 
 def create_ids_db():
   data = {
@@ -34,11 +35,24 @@ async def xtwitter_webhook():
     try:
       tweet_id = await xtwitter.get_latest_tweet_id()
       if tweet_id and tweet_id != latest_tweet_id:
-        send_webhook(f"ななひら tweeted!\n\nhttps://twitter.com/nanafeed_/status/{tweet_id}")
+        tweet_user_pfp = await xtwitter.get_profile_picture()
+        tweet_text = await xtwitter.get_tweet_text()
+        tweet_media_url = await xtwitter.get_tweet_media_url(tweet_id)
+        tweet_url = f"https://twitter.com/{USER_ID}/status/{tweet_id}"
+        embed = DiscordEmbed(
+          description=f"ななひら tweeted on X/Twitter\n\n{tweet_text}"
+        )
+        embed.set_author(name='ななひら - X/Twitter', url=tweet_url)
+        embed.set_thumbnail(url=tweet_user_pfp)
+        embed.set_image(tweet_media_url)
+        embedhook = DiscordWebhook(url=webhook_url)
+        embedhook.add_embed(embed)
+        embedhook.execute()
         latest_tweet_id = tweet_id
     
     except Exception as e:
       print(f"An error occurred in the XTwitter webhook: {e}")
+      await asyncio.sleep(400)
 
     await asyncio.sleep(0)
 
@@ -50,9 +64,9 @@ async def album_spotify():
     album_name = album['items'][0]['name']
     album_cover_url = album['items'][0]['images'][0]['url']
     embed = DiscordEmbed(
-      title="ななひら - Spotify",
-      description=f"ななひら uploaded an album on Spotify\n\n**{album_name} - [Spotify Link]({album_url})**"
+      description=f"ななひら uploaded an album on Spotify\n\n**{album_name}**"
     )
+    embed.set_author(name="ななひら - Spotify", url=album_url)
     embed.set_image(url=album_cover_url)
     embedhook = DiscordWebhook(url=webhook_url)
     embedhook.add_embed(embed)
@@ -68,9 +82,9 @@ async def single_spotify():
     single_name = single['items'][0]['name']
     single_cover_url = single['items'][0]['images'][0]['url']
     embed = DiscordEmbed(
-      title="ななひら - Spotify",
-      description=f"ななひら uploaded a single on Spotify\n\n**{single_name} - [Spotify Link]({single_url})**"
+      description=f"ななひら uploaded a single on Spotify\n\n**{single_name}**"
     )
+    embed.set_author(name="ななひら - Spotify", url=single_url)
     embed.set_image(url=single_cover_url)
     embedhook = DiscordWebhook(url=webhook_url)
     embedhook.add_embed(embed)
@@ -86,9 +100,9 @@ async def album_appeared_on_spotify():
     album_appeared_on_name = album_appeared_on['items'][0]['name']
     album_appeared_on_cover_url = album_appeared_on['items'][0]['images'][0]['url']
     embed = DiscordEmbed(
-      title="ななひら - Spotify",
-      description=f"ななひら appeared on an album on Spotify\n\n**{album_appeared_on_name} - [Spotify Link]({album_appeared_on_url})**"
+      description=f"ななひら appeared on an album on Spotify\n\n**{album_appeared_on_name}**"
     )
+    embed.set_author(name="ななひら - Spotify", url=album_appeared_on_url)
     embed.set_image(url=album_appeared_on_cover_url)
     embedhook = DiscordWebhook(url=webhook_url)
     embedhook.add_embed(embed)
@@ -125,9 +139,9 @@ async def youtube_webhook():
         video_thumbnail = await youtube.get_video_thumbnail()
         video_title = await youtube.get_video_title()
         embed = DiscordEmbed(
-        title="ななひら - Youtube",
-        description=f"ななひら uploaded a video on Youtube\n\n**{video_title} - [Youtube Link]({video_url})**"
+        description=f"ななひら uploaded a video on Youtube\n\n**{video_title}**"
         )
+        embed.set_author(name="ななひら - Youtube", url=video_url)
         embed.set_image(url=video_thumbnail)
         embedhook = DiscordWebhook(url=webhook_url)
         embedhook.add_embed(embed)
@@ -139,9 +153,9 @@ async def youtube_webhook():
         stream_thumbnail = await youtube.get_stream_thumbnail()
         stream_title = await youtube.get_stream_title()
         embed = DiscordEmbed(
-        title="ななひら - Youtube",
-        description=f"ななひら is/was live on Youtube\n\n**{stream_title} - [Youtube Link]({stream_url})**"
+        description=f"ななひら is/was live on Youtube\n\n**{stream_title}**"
         )
+        embed.set_author(name="ななひら - Youtube", url=stream_url)
         embed.set_image(url=stream_thumbnail)
         embedhook = DiscordWebhook(url=webhook_url)
         embedhook.add_embed(embed)
